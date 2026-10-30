@@ -56,6 +56,22 @@ async function buscar() {
   renderHist(); veredito();
 }
 
+// Para preços sem código de barras (ex.: capturados de lojas online): procura pelas palavras do nome
+async function buscarNome() {
+  const palavras = $('nome').value.toLowerCase().replace(/[%_,()]/g, ' ').split(/\s+/).filter(w => w.length > 2).slice(0, 3);
+  if (!palavras.length) return;
+  $('hist').innerHTML = '<small>Buscando…</small>';
+  let q = sb.from('cp_precos').select('*').order('data_ref', { ascending: false }).limit(60);
+  palavras.forEach(w => { q = q.ilike('produto', `%${w}%`); });
+  const { data, error } = await q;
+  if (error) { $('hist').innerHTML = `<small>Erro: ${esc(error.message)}</small>`; return; }
+  historico = data || [];
+  if (!historico.length) { $('hist').innerHTML = '<small>Nada encontrado com esse nome.</small>'; veredito(); return; }
+  $('qtd').value = historico[0].qtd; $('un').value = historico[0].unidade;
+  renderHist(); veredito();
+}
+$('buscarNome').onclick = buscarNome;
+
 function renderHist() {
   // último preço de cada loja+origem
   const vistos = new Map();
