@@ -1,4 +1,4 @@
-﻿// Guarda sÃ³ os arquivos do app (nÃ£o as chamadas ao Supabase), para abrir rÃ¡pido no mercado.
+﻿// Guarda só os arquivos do app (não as chamadas ao Supabase), para abrir rápido no mercado.
 const CACHE = 'comparador-v2';
 const ARQUIVOS = ['./', './index.html', './app.js', './supabase.js', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
 
