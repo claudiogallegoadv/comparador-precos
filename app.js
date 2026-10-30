@@ -119,10 +119,34 @@ $('salvar').onclick = async () => {
 };
 
 // ---------- Leitor de código de barras ----------
-let stream = null;
-function pararCamera() { if (stream) stream.getTracks().forEach(t => t.stop()); stream = null; $('vid').hidden = true; }
+let stream = null, zx = null;
+function pararCamera() {
+  if (stream) stream.getTracks().forEach(t => t.stop());
+  stream = null;
+  if (zx) { zx.reset(); zx = null; }
+  $('vid').hidden = true;
+}
+
+// Plano B para navegadores sem BarcodeDetector (iPhone/Safari, Firefox etc.): biblioteca ZXing
+function escanearComZxing() {
+  const F = ZXing.BarcodeFormat, hints = new Map();
+  hints.set(ZXing.DecodeHintType.POSSIBLE_FORMATS, [F.EAN_13, F.EAN_8, F.UPC_A, F.UPC_E]);
+  hints.set(ZXing.DecodeHintType.TRY_HARDER, true);
+  pararCamera();
+  const reader = new ZXing.BrowserMultiFormatReader(hints);
+  zx = reader;
+  const v = $('vid'); v.hidden = false;
+  reader.decodeFromConstraints({ video: { facingMode: 'environment' } }, v, (res) => {
+    if (!res) return;
+    $('ean').value = res.getText(); pararCamera(); navigator.vibrate?.(60); buscar();
+  }).catch(() => { pararCamera(); alert('Não consegui acessar a câmera. Permita o acesso ou digite o número.'); });
+}
+
 $('scan').onclick = async () => {
-  if (!('BarcodeDetector' in window)) { alert('Este navegador não lê código de barras. Digite o número.'); return; }
+  if (!('BarcodeDetector' in window)) {
+    if (window.ZXing) return escanearComZxing();
+    alert('Este navegador não lê código de barras. Digite o número.'); return;
+  }
   try {
     pararCamera();
     stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });

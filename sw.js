@@ -1,6 +1,6 @@
 ﻿// Guarda só os arquivos do app (não as chamadas ao Supabase), para abrir rápido no mercado.
-const CACHE = 'comparador-v2';
-const ARQUIVOS = ['./', './index.html', './app.js', './supabase.js', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
+const CACHE = 'comparador-v3';
+const ARQUIVOS = ['./', './index.html', './app.js', './supabase.js', './zxing.js', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(ARQUIVOS)));
